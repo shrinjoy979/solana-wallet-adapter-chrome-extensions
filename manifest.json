@@ -1,13 +1,21 @@
 {
   "manifest_version": 3,
   "name": "My TS Extension",
-  "version": "1.0",
-  "description": "Chrome Extension with TypeScript",
+  "version": "1.0.0",
+  "description": "",
   "action": {
     "default_popup": "popup.html",
-    "default_icon": "icon.png"
+    "default_icon": {
+      "16":  "icon.png",
+      "48":  "icon.png",
+      "128": "icon.png"
+    }
   },
-  "permissions": ["activeTab", "storage"],
+  "icons": {
+    "16":  "icon.png",
+    "48":  "icon.png",
+    "128": "icon.png"
+  },
   "background": {
     "service_worker": "background.js"
   },
@@ -16,5 +24,6 @@
       "matches": ["<all_urls>"],
       "js": ["content.js"]
     }
-  ]
+  ],
+  "permissions": ["activeTab", "tabs"]
 }

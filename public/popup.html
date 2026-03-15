@@ -22,14 +22,9 @@
         gap: 16px;
       }
 
-      .page.active {
-        display: flex;
-      }
+      .page.active { display: flex; }
 
-      .logo {
-        font-size: 40px;
-        margin-bottom: 8px;
-      }
+      .logo { font-size: 40px; margin-bottom: 8px; }
 
       h2 {
         font-size: 20px;
@@ -58,10 +53,7 @@
 
       .btn:hover { opacity: 0.85; }
 
-      .btn-primary {
-        background: #AB9FF2;
-        color: #000;
-      }
+      .btn-primary { background: #AB9FF2; color: #000; }
 
       .btn-secondary {
         background: #1e1e30;
@@ -81,6 +73,7 @@
 
       .back-btn:hover { color: #fff; }
 
+      /* Seed phrase grid */
       #seedGrid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -107,35 +100,85 @@
         min-width: 14px;
       }
 
-      .seed-text {
-        color: #fff;
-        font-weight: 500;
+      .seed-text { color: #fff; font-weight: 500; }
+
+      /* Recovery phrase grid */
+      #recoveryGrid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        width: 100%;
+        margin: 12px 0;
       }
+
+      .recovery-word {
+        background: #1e1e30;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 4px 6px;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .recovery-index {
+        color: #AB9FF2;
+        font-weight: 700;
+        font-size: 10px;
+        min-width: 14px;
+      }
+
+      .recovery-input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: #fff;
+        font-size: 11px;
+        width: 100%;
+        padding: 2px 0;
+      }
+
+      .recovery-input::placeholder { color: #555; }
     </style>
   </head>
   <body>
-
-    <!-- PAGE 1 -->
+    <!-- PAGE 1 — Welcome -->
     <div class="page active" id="page1">
-       <img src="./icon.png" alt="SOLi Logo" />
+      <img src="./icon.png" alt="Logo" />
       <h2>Welcome</h2>
       <p class="subtitle">Set up your wallet to get started</p>
       <button class="btn btn-primary" id="btnCreateWallet">+ Create a New Wallet</button>
       <button class="btn btn-secondary" id="btnHaveWallet">I Already Have a Wallet</button>
     </div>
 
-    <!-- PAGE 2 -->
+    <!-- PAGE 2 — New Seed Phrase -->
     <div class="page" id="page2">
       <h2>Your Seed Phrase</h2>
       <p class="subtitle">Write these 12 words down in order and store them safely.</p>
-
       <div id="seedGrid"></div>
-
       <button class="btn btn-secondary" id="btnCopy">Copy Phrase</button>
-      <button class="btn btn-primary" id="btnContinue">I've Saved It</button>
-      <button class="back-btn" id="btnBack">Back</button>
+      <button class="btn btn-primary" id="btnContinue">I've Saved It →</button>
+      <button class="back-btn" id="btnBack">← Back</button>
     </div>
 
+    <!-- PAGE 3 — Already Have Wallet -->
+    <div class="page" id="page3">
+      <img src="./icon.png" alt="Logo" />
+      <h2>Restore Wallet</h2>
+      <p class="subtitle">Choose how you want to import your existing wallet</p>
+      <button class="btn btn-primary" id="btnImportPhrase">Import Recovery Phrase</button>
+      <button class="btn btn-secondary" id="btnImportPrivateKey">Import Private Key</button>
+      <button class="back-btn" id="btnBackPage3">Back</button>
+    </div>
+
+    <!-- PAGE 4 — Enter Recovery Phrase -->
+    <div class="page" id="page4">
+      <h2>Enter Recovery Phrase</h2>
+      <p class="subtitle">Enter your 12 words in the correct order</p>
+      <div id="recoveryGrid"></div>
+      <button class="btn btn-primary" id="btnConfirmRecovery">Confirm & Restore</button>
+      <button class="back-btn" id="btnBackPage4">Back</button>
+    </div>
     <script src="popup.js"></script>
   </body>
 </html>
