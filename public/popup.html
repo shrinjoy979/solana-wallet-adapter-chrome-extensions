@@ -59,8 +59,8 @@
       .btn:hover { opacity: 0.85; }
 
       .btn-primary {
-        background: #6c5ce7;
-        color: #fff;
+        background: #AB9FF2;
+        color: #000;
       }
 
       .btn-secondary {
@@ -80,6 +80,37 @@
       }
 
       .back-btn:hover { color: #fff; }
+
+      #seedGrid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        width: 100%;
+        margin: 12px 0;
+      }
+
+      .seed-word {
+        background: #1e1e30;
+        border: 1px solid #333;
+        border-radius: 8px;
+        padding: 6px 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+      }
+
+      .seed-index {
+        color: #6c5ce7;
+        font-weight: 700;
+        font-size: 10px;
+        min-width: 14px;
+      }
+
+      .seed-text {
+        color: #fff;
+        font-weight: 500;
+      }
     </style>
   </head>
   <body>
@@ -95,11 +126,13 @@
 
     <!-- PAGE 2 -->
     <div class="page" id="page2">
-       <img src="./icon.png" alt="SOLi Logo" />
-      <h2>Choose Setup Method</h2>
-      <p class="subtitle" id="page2Subtitle">How would you like to continue?</p>
-      <button class="btn btn-primary" id="btnEmail">Continue with Email</button>
-      <button class="btn btn-secondary" id="btnRecovery">Create a Recovery Phrase Wallet</button>
+      <h2>Your Seed Phrase</h2>
+      <p class="subtitle">Write these 12 words down in order and store them safely.</p>
+
+      <div id="seedGrid"></div>
+
+      <button class="btn btn-secondary" id="btnCopy">Copy Phrase</button>
+      <button class="btn btn-primary" id="btnContinue">I've Saved It</button>
       <button class="back-btn" id="btnBack">Back</button>
     </div>
 
