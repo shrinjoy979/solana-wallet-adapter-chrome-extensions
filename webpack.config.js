@@ -1,5 +1,5 @@
 const path = require("path");
-const CopyPlugin = require("copy-webpack-plugin");
+const webpack = require("webpack");  // ← add this
 
 module.exports = {
   mode: "development",
@@ -13,6 +13,21 @@ module.exports = {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
   },
+  resolve: {
+    extensions: [".ts", ".js"],
+    fallback: {
+      crypto: require.resolve("crypto-browserify"),
+      stream: require.resolve("stream-browserify"),
+      buffer: require.resolve("buffer/"),
+      vm: require.resolve("vm-browserify"),
+    },
+  },
+  plugins: [
+    new webpack.ProvidePlugin({   // ← add this block
+      Buffer: ["buffer", "Buffer"],
+      process: "process/browser",
+    }),
+  ],
   module: {
     rules: [
       {
@@ -22,15 +37,4 @@ module.exports = {
       },
     ],
   },
-  resolve: {
-    extensions: [".ts", ".js"],
-  },
-  plugins: [
-    new CopyPlugin({
-      patterns: [
-        { from: "public", to: "." },   // copies popup.html, icons
-        { from: "manifest.json", to: "manifest.json" },
-      ],
-    }),
-  ],
 };
