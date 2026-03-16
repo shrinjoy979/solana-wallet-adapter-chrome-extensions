@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "My TS Extension",
+  "name": "SOLi",
   "version": "1.0.0",
-  "description": "",
+  "description": "SOLi is a Solana Chrome extension for managing wallets, tokens, transactions, and key utilities.",
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -25,5 +25,5 @@
       "js": ["content.js"]
     }
   ],
-  "permissions": ["activeTab", "tabs"]
+  "permissions": ["activeTab", "tabs", "storage"]
 }

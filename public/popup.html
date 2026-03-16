@@ -139,6 +139,178 @@
       }
 
       .recovery-input::placeholder { color: #555; }
+
+      .input-group {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        position: relative;
+      }
+
+      .input-label {
+        font-size: 12px;
+        color: #888;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .text-input {
+        width: 100%;
+        background: #1e1e30;
+        border: 1px solid #333;
+        border-radius: 10px;
+        padding: 10px 12px;
+        color: #fff;
+        font-size: 13px;
+        outline: none;
+        transition: border 0.2s;
+      }
+
+      .text-input:focus {
+        border-color: #AB9FF2;
+      }
+
+      .text-input::placeholder { color: #555; }
+
+      .toggle-visibility {
+        position: absolute;
+        right: 10px;
+        bottom: 8px;
+        background: none;
+        border: none;
+        color: #888;
+        font-size: 11px;
+        cursor: pointer;
+      }
+
+      .toggle-visibility:hover { color: #fff; }
+
+      /* Error message */
+      .error-msg {
+        color: #ff6b6b;
+        font-size: 12px;
+        text-align: center;
+        min-height: 16px;
+        width: 100%;
+      }
+
+      /* Dashboard */
+      .wallet-header {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #1e1e30;
+      }
+
+      .wallet-label {
+        font-size: 11px;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .address-box {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: #1e1e30;
+        border: 1px solid #333;
+        border-radius: 20px;
+        padding: 4px 12px;
+        font-size: 11px;
+        color: #888;
+      }
+
+      .copy-address-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 11px;
+        padding: 0;
+      }
+
+      .balance-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 16px 0;
+      }
+
+      .balance-label {
+        font-size: 11px;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .balance-amount {
+        font-size: 36px;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      .balance-amount span {
+        font-size: 18px;
+        color: #AB9FF2;
+      }
+
+      .action-row {
+        display: flex;
+        gap: 16px;
+        width: 100%;
+      }
+
+      .action-btn {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        padding: 12px;
+        background: #1e1e30;
+        border: 1px solid #333;
+        border-radius: 12px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: border-color 0.2s;
+      }
+
+      .action-btn:hover { border-color: #AB9FF2; }
+
+      .action-btn span {
+        font-size: 20px;
+        color: #AB9FF2;
+      }
+
+      .tx-section {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .tx-label {
+        font-size: 12px;
+        color: #888;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .tx-empty {
+        font-size: 12px;
+        color: #555;
+        text-align: center;
+        padding: 16px 0;
+      }
     </style>
   </head>
   <body>
@@ -178,6 +350,92 @@
       <div id="recoveryGrid"></div>
       <button class="btn btn-primary" id="btnConfirmRecovery">Confirm & Restore</button>
       <button class="back-btn" id="btnBackPage4">Back</button>
+    </div>
+
+    <!-- PAGE 5 — Import Private Key -->
+    <div class="page" id="page5">
+      <img src="./icon.png" alt="Logo" />
+      <h2>Import Private Key</h2>
+      <p class="subtitle">Enter your wallet name and private key</p>
+
+      <div class="input-group">
+        <label class="input-label">Wallet Name</label>
+        <input
+          class="text-input"
+          id="inputWalletName"
+          type="text"
+          placeholder="e.g. My Solana Wallet"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Private Key</label>
+        <input
+          class="text-input"
+          id="inputPrivateKey"
+          type="password"
+          placeholder="Enter your private key"
+          autocomplete="off"
+        />
+        <button class="toggle-visibility" id="btnToggleKey">Show</button>
+      </div>
+
+      <button class="btn btn-primary" id="btnConfirmPrivateKey">Import Wallet</button>
+      <button class="back-btn" id="btnBackPage5">Back</button>
+    </div>
+
+    <!-- PAGE 6 — Set Password -->
+    <div class="page" id="page6">
+      <img src="./icon.png" alt="Logo" />
+      <h2>Set a Password</h2>
+      <p class="subtitle">This password encrypts your wallet locally on your device</p>
+
+      <div class="input-group">
+        <label class="input-label">Password</label>
+        <input class="text-input" id="inputPassword" type="password" placeholder="Min 8 characters" autocomplete="off" />
+      </div>
+
+      <div class="input-group">
+        <label class="input-label">Confirm Password</label>
+        <input class="text-input" id="inputConfirmPassword" type="password" placeholder="Repeat password" autocomplete="off" />
+      </div>
+
+      <p class="error-msg" id="passwordError"></p>
+
+      <button class="btn btn-primary" id="btnConfirmPassword">Create Password</button>
+      <button class="back-btn" id="btnBackPage6">Back</button>
+    </div>
+
+    <!-- PAGE 7 — Dashboard -->
+    <div class="page" id="page7">
+      <div class="wallet-header">
+        <p class="wallet-label">Wallet</p>
+        <h2 id="dashWalletName">My Wallet</h2>
+        <div class="address-box">
+          <span id="dashAddress">Loading...</span>
+          <button class="copy-address-btn" id="btnCopyAddress">📋</button>
+        </div>
+      </div>
+
+      <div class="balance-box">
+        <p class="balance-label">Balance</p>
+        <h1 class="balance-amount">0.00 <span>SOL</span></h1>
+      </div>
+
+      <div class="action-row">
+        <button class="action-btn" id="btnSend">
+          Send
+        </button>
+        <button class="action-btn" id="btnReceive">
+          Receive
+        </button>
+      </div>
+
+      <div class="tx-section">
+        <p class="tx-label">Recent Transactions</p>
+        <p class="tx-empty">No transactions yet</p>
+      </div>
     </div>
     <script src="popup.js"></script>
   </body>
