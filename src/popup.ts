@@ -440,23 +440,48 @@ async function saveWalletAndOpenDashboard(password: string): Promise<void> {
 // ── Derive real Solana public key ──────────────────────────
 function derivePublicAddress(secret: string): string {
   try {
-    // Case 1: it's a mnemonic (12 words)
-    if (secret.trim().split(" ").length === 12) {
-      const seed = bip39.mnemonicToSeedSync(secret).slice(0, 32);
-      const keypair = Keypair.fromSeed(seed);
+    const words = secret.trim().split(" ");
+
+    // Case 1: mnemonic (12 words)
+    if (words.length === 12) {
+      const seed = bip39.mnemonicToSeedSync(secret);
+      const ab = seed.buffer.slice(seed.byteOffset, seed.byteOffset + 32);
+      const seed32 = new Uint8Array(ab);
+      const keypair = Keypair.fromSeed(seed32);
       return keypair.publicKey.toString();
     }
 
-    // Case 2: it's a base58 private key
     const decoded = bs58.decode(secret);
-    const keypair = Keypair.fromSecretKey(decoded);
+    console.log("🔍 decoded length:", decoded.length);
+
+    const keyBytes = new Uint8Array(
+      decoded.buffer.slice(
+        decoded.byteOffset,
+        decoded.byteOffset + decoded.byteLength,
+      ),
+    );
+
+    let keypair: Keypair;
+
+    if (keyBytes.length === 32) {
+      // 32 bytes = seed only → use fromSeed
+      keypair = Keypair.fromSeed(keyBytes);
+    } else if (keyBytes.length === 64) {
+      // 64 bytes = full keypair → use fromSecretKey
+      keypair = Keypair.fromSecretKey(keyBytes);
+    } else {
+      throw new Error(
+        `Unexpected key length: ${keyBytes.length}. Expected 32 or 64 bytes.`,
+      );
+    }
+
+    console.log("✅ Public key:", keypair.publicKey.toString());
     return keypair.publicKey.toString();
   } catch (err) {
     console.error("❌ Could not derive public key:", err);
     return "Invalid Key";
   }
 }
-
 // ```
 
 // ---
