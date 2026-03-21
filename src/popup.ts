@@ -7,8 +7,8 @@ import {
 } from "@solana/web3.js";
 import bs58 from "bs58";
 
-// ── Solana Connection ──────────────────────────────────────
-const SOLANA_RPC = "https://api.devnet.solana.com";
+const SOLANA_RPC =
+  "https://solana-devnet.g.alchemy.com/v2/IR7u23Ytxfa-vBJZhy2fXkTnvxKGUPUa";
 const connection = new Connection(SOLANA_RPC, "confirmed");
 
 interface Message {
@@ -22,14 +22,15 @@ interface WalletData {
   iv: string; // initialisation vector for decryption
 }
 
-// ── Helper — get element safely ────────────────────────────
+// ── Helper — get element safely
+
 function getEl<T extends HTMLElement>(id: string): T | null {
   const el = document.getElementById(id) as T | null;
   if (!el) console.error(`❌ Element not found: #${id}`);
   return el;
 }
 
-// ── Pages ──────────────────────────────────────────────────
+// Pages
 const page1 = getEl<HTMLDivElement>("page1");
 const page2 = getEl<HTMLDivElement>("page2");
 const page3 = getEl<HTMLDivElement>("page3");
@@ -38,53 +39,54 @@ const page5 = getEl<HTMLDivElement>("page5");
 const page6 = getEl<HTMLDivElement>("page6");
 const page7 = getEl<HTMLDivElement>("page7");
 
-// ── Page 1 ─────────────────────────────────────────────────
+// ── Page 1
 const btnCreateWallet = getEl<HTMLButtonElement>("btnCreateWallet");
 const btnHaveWallet = getEl<HTMLButtonElement>("btnHaveWallet");
 
-// ── Page 2 ─────────────────────────────────────────────────
+// ── Page 2
 const seedGrid = getEl<HTMLDivElement>("seedGrid");
 const btnCopy = getEl<HTMLButtonElement>("btnCopy");
 const btnContinue = getEl<HTMLButtonElement>("btnContinue");
 const btnBack = getEl<HTMLButtonElement>("btnBack");
 
-// ── Page 3 ─────────────────────────────────────────────────
+// ── Page 3
 const btnImportPhrase = getEl<HTMLButtonElement>("btnImportPhrase");
 const btnImportPrivateKey = getEl<HTMLButtonElement>("btnImportPrivateKey");
 const btnBackPage3 = getEl<HTMLButtonElement>("btnBackPage3");
 
-// ── Page 4 ─────────────────────────────────────────────────
+// ── Page 4
 const recoveryGrid = getEl<HTMLDivElement>("recoveryGrid");
 const btnConfirmRecovery = getEl<HTMLButtonElement>("btnConfirmRecovery");
 const btnBackPage4 = getEl<HTMLButtonElement>("btnBackPage4");
 
-// ── Page 5 ─────────────────────────────────────────────────
+// ── Page 5
 const inputWalletName = getEl<HTMLInputElement>("inputWalletName");
 const inputPrivateKey = getEl<HTMLInputElement>("inputPrivateKey");
 const btnToggleKey = getEl<HTMLButtonElement>("btnToggleKey");
 const btnConfirmPrivateKey = getEl<HTMLButtonElement>("btnConfirmPrivateKey");
 const btnBackPage5 = getEl<HTMLButtonElement>("btnBackPage5");
 
-// ── Page 6 ─────────────────────────────────────────────────
+// ── Page 6
 const inputPassword = getEl<HTMLInputElement>("inputPassword");
 const inputConfirmPassword = getEl<HTMLInputElement>("inputConfirmPassword");
 const passwordError = getEl<HTMLParagraphElement>("passwordError");
 const btnConfirmPassword = getEl<HTMLButtonElement>("btnConfirmPassword");
 const btnBackPage6 = getEl<HTMLButtonElement>("btnBackPage6");
 
-// ── Page 7 ─────────────────────────────────────────────────
+// ── Page 7
 const dashWalletName = getEl<HTMLHeadingElement>("dashWalletName");
 const dashAddress = getEl<HTMLSpanElement>("dashAddress");
 const btnCopyAddress = getEl<HTMLButtonElement>("btnCopyAddress");
+const balanceAmount = getEl<HTMLHeadingElement>("balanceAmount");
 const btnSend = getEl<HTMLButtonElement>("btnSend");
 const btnReceive = getEl<HTMLButtonElement>("btnReceive");
 
-// ── State ──────────────────────────────────────────────────
+// ── State
 let currentMnemonic = "";
 let pendingWalletName = "";
 let pendingSecret = ""; // mnemonic or private key — cleared after encryption
 
-// ── Navigation ─────────────────────────────────────────────
+// ── Navigation
 function showPage(pageEl: HTMLDivElement | null): void {
   if (!pageEl) {
     console.error("❌ showPage called with null");
@@ -108,7 +110,7 @@ function on(btn: HTMLButtonElement | null, handler: () => void): void {
   btn.addEventListener("click", handler);
 }
 
-// ── Encryption helpers (Web Crypto API) ────────────────────
+// ── Encryption helpers (Web Crypto API)
 async function deriveKey(
   password: string,
   salt: Uint8Array,
@@ -161,15 +163,32 @@ async function encryptSecret(
   };
 }
 
+async function loadBalance(address: string): Promise<void> {
+  if (!balanceAmount) return;
+
+  balanceAmount.innerHTML = `… <span>SOL</span>`; // loading placeholder
+
+  try {
+    const pubkey = new PublicKey(address);
+    const lamports = await connection.getBalance(pubkey);
+    const sol = (lamports / 1e9).toFixed(4);
+
+    balanceAmount.innerHTML = `${sol} <span>SOL</span>`;
+  } catch (err) {
+    console.error("❌ Failed to load balance:", err);
+    balanceAmount.innerHTML = `— <span>SOL</span>`;
+  }
+}
+
 function loadDashboard(wallet: WalletData): void {
   if (dashWalletName) dashWalletName.textContent = wallet.name;
   if (dashAddress) dashAddress.textContent = wallet.address;
 
-  // Load transactions when dashboard opens
+  loadBalance(wallet.address);
   loadTransactions(wallet.address);
 }
 
-// ── Page 2 — Seed Phrase ───────────────────────────────────
+// ── Page 2 — Seed Phrase
 function renderSeedPhrase(): string {
   const mnemonic = bip39.generateMnemonic();
   const words = mnemonic.split(" ");
@@ -187,7 +206,7 @@ function renderSeedPhrase(): string {
   return mnemonic;
 }
 
-// ── Page 4 — Recovery Inputs ───────────────────────────────
+// ── Page 4 — Recovery Inputs
 function renderRecoveryInputs(): void {
   if (!recoveryGrid) return;
   recoveryGrid.innerHTML = Array.from(
@@ -208,7 +227,7 @@ function getEnteredMnemonic(): string {
   }).join(" ");
 }
 
-// ── Wire: Page 1 ───────────────────────────────────────────
+// ── Wire: Page 1
 on(btnCreateWallet, () => {
   try {
     currentMnemonic = renderSeedPhrase();
@@ -223,7 +242,7 @@ on(btnCreateWallet, () => {
 
 on(btnHaveWallet, () => showPage(page3));
 
-// ── Wire: Page 2 ───────────────────────────────────────────
+// ── Wire: Page 2
 on(btnCopy, () => {
   navigator.clipboard.writeText(currentMnemonic).then(() => {
     if (btnCopy) {
@@ -237,7 +256,7 @@ on(btnCopy, () => {
 on(btnContinue, () => showPage(page6));
 on(btnBack, () => showPage(page1));
 
-// ── Wire: Page 3 ───────────────────────────────────────────
+// ── Wire: Page 3
 on(btnImportPhrase, () => {
   renderRecoveryInputs();
   showPage(page4);
@@ -245,7 +264,7 @@ on(btnImportPhrase, () => {
 on(btnImportPrivateKey, () => showPage(page5));
 on(btnBackPage3, () => showPage(page1));
 
-// ── Wire: Page 4 ───────────────────────────────────────────
+// ── Wire: Page 4
 on(btnConfirmRecovery, () => {
   const mnemonic = getEnteredMnemonic();
   if (mnemonic.split(" ").some((w) => w === "")) {
@@ -262,7 +281,7 @@ on(btnConfirmRecovery, () => {
 });
 on(btnBackPage4, () => showPage(page3));
 
-// ── Wire: Page 5 ───────────────────────────────────────────
+// ── Wire: Page 5
 on(btnToggleKey, () => {
   if (!inputPrivateKey || !btnToggleKey) return;
   const isHidden = inputPrivateKey.type === "password";
@@ -287,7 +306,7 @@ on(btnConfirmPrivateKey, () => {
 });
 on(btnBackPage5, () => showPage(page3));
 
-// ── Wire: Page 6 ───────────────────────────────────────────
+// ── Wire: Page 6
 on(btnConfirmPassword, async () => {
   const pw = inputPassword?.value ?? "";
   const cpw = inputConfirmPassword?.value ?? "";
@@ -307,7 +326,7 @@ on(btnConfirmPassword, async () => {
 });
 on(btnBackPage6, () => showPage(page5));
 
-// ── Wire: Page 7 ───────────────────────────────────────────
+// ── Wire: Page 7
 on(btnCopyAddress, () => {
   const addr = dashAddress?.textContent ?? "";
   navigator.clipboard.writeText(addr).then(() => {
@@ -329,7 +348,7 @@ chrome.storage.local.get("wallet", (result) => {
   }
 });
 
-// ── Fetch & Display Transactions ───────────────────────────
+// ── Fetch & Display Transactions
 async function loadTransactions(address: string): Promise<void> {
   const txSection = document.getElementById("txList");
   if (!txSection) return;
@@ -415,7 +434,7 @@ function truncate(str: string, len = 8): string {
   return str.slice(0, len) + "..." + str.slice(-4);
 }
 
-// ── saveWalletAndOpenDashboard ─────────────────────
+// ── saveWalletAndOpenDashboard
 async function saveWalletAndOpenDashboard(password: string): Promise<void> {
   const { encrypted, iv, salt } = await encryptSecret(pendingSecret, password);
 
