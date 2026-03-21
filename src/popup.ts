@@ -77,7 +77,7 @@ const btnBackPage6 = getEl<HTMLButtonElement>("btnBackPage6");
 const dashWalletName = getEl<HTMLHeadingElement>("dashWalletName");
 const dashAddress = getEl<HTMLSpanElement>("dashAddress");
 const btnCopyAddress = getEl<HTMLButtonElement>("btnCopyAddress");
-const balanceAmount = getEl<HTMLHeadingElement>("balanceAmount");
+const balanceAmount = getEl<HTMLHeadingElement>("balanceAmount"); // ← new
 const btnSend = getEl<HTMLButtonElement>("btnSend");
 const btnReceive = getEl<HTMLButtonElement>("btnReceive");
 
@@ -126,7 +126,7 @@ async function deriveKey(
   return crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
-      salt: salt.buffer as ArrayBuffer, // ← cast here
+      salt: salt.buffer as ArrayBuffer,
       iterations: 100_000,
       hash: "SHA-256",
     },
@@ -145,10 +145,11 @@ async function encryptSecret(
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const key = await deriveKey(password, salt);
+
   const encrypted = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv: iv.buffer as ArrayBuffer }, // ← cast here
+    { name: "AES-GCM", iv: iv.buffer as ArrayBuffer },
     key,
-    enc.encode(secret).buffer as ArrayBuffer, // ← cast here
+    enc.encode(secret).buffer as ArrayBuffer,
   );
 
   const toHex = (buf: Uint8Array) =>
@@ -163,6 +164,7 @@ async function encryptSecret(
   };
 }
 
+// ── Fetch & display live SOL balance ──────────────────────────────────────────
 async function loadBalance(address: string): Promise<void> {
   if (!balanceAmount) return;
 
@@ -184,14 +186,15 @@ function loadDashboard(wallet: WalletData): void {
   if (dashWalletName) dashWalletName.textContent = wallet.name;
   if (dashAddress) dashAddress.textContent = wallet.address;
 
-  loadBalance(wallet.address);
-  loadTransactions(wallet.address);
+  loadBalance(wallet.address); // ← fetch live balance
+  loadTransactions(wallet.address); // ← fetch transactions
 }
 
 // ── Page 2 — Seed Phrase
 function renderSeedPhrase(): string {
   const mnemonic = bip39.generateMnemonic();
   const words = mnemonic.split(" ");
+
   if (seedGrid) {
     seedGrid.innerHTML = words
       .map(
@@ -203,6 +206,7 @@ function renderSeedPhrase(): string {
       )
       .join("");
   }
+
   return mnemonic;
 }
 
@@ -246,13 +250,12 @@ on(btnHaveWallet, () => showPage(page3));
 on(btnCopy, () => {
   navigator.clipboard.writeText(currentMnemonic).then(() => {
     if (btnCopy) {
-      btnCopy.textContent = "✅ Copied!";
+      btnCopy.textContent = "Copied!";
       setTimeout(() => (btnCopy.textContent = "Copy Phrase"), 2000);
     }
   });
 });
 
-// After saving seed → go to set password
 on(btnContinue, () => showPage(page6));
 on(btnBack, () => showPage(page1));
 
@@ -277,7 +280,7 @@ on(btnConfirmRecovery, () => {
   }
   pendingSecret = mnemonic;
   pendingWalletName = "Restored Wallet";
-  showPage(page6); // → set password
+  showPage(page6);
 });
 on(btnBackPage4, () => showPage(page3));
 
@@ -286,7 +289,7 @@ on(btnToggleKey, () => {
   if (!inputPrivateKey || !btnToggleKey) return;
   const isHidden = inputPrivateKey.type === "password";
   inputPrivateKey.type = isHidden ? "text" : "password";
-  btnToggleKey.textContent = isHidden ? "🙈 Hide" : "👁 Show";
+  btnToggleKey.textContent = isHidden ? "Hide" : "Show";
 });
 
 on(btnConfirmPrivateKey, () => {
@@ -302,7 +305,7 @@ on(btnConfirmPrivateKey, () => {
   }
   pendingWalletName = name;
   pendingSecret = key;
-  showPage(page6); // → set password
+  showPage(page6);
 });
 on(btnBackPage5, () => showPage(page3));
 
@@ -329,22 +332,27 @@ on(btnBackPage6, () => showPage(page5));
 // ── Wire: Page 7
 on(btnCopyAddress, () => {
   const addr = dashAddress?.textContent ?? "";
+  const iconCopy = document.getElementById("iconCopy");
+  const iconCheck = document.getElementById("iconCheck");
+
   navigator.clipboard.writeText(addr).then(() => {
-    if (btnCopyAddress) {
-      btnCopyAddress.textContent = "✅";
-      setTimeout(() => (btnCopyAddress.textContent = "📋"), 2000);
-    }
+    if (iconCopy) iconCopy.style.display = "none";
+    if (iconCheck) iconCheck.style.display = "block";
+    setTimeout(() => {
+      if (iconCopy) iconCopy.style.display = "block";
+      if (iconCheck) iconCheck.style.display = "none";
+    }, 2000);
   });
 });
 
 on(btnSend, () => sendMessage("send"));
 on(btnReceive, () => sendMessage("receive"));
 
-// ── On load — check if wallet already exists ───────────────
+// ── On load — check if wallet already exists
 chrome.storage.local.get("wallet", (result) => {
   if (result.wallet) {
     loadDashboard(result.wallet as WalletData);
-    showPage(page7); // skip setup if wallet already saved
+    showPage(page7);
   }
 });
 
@@ -358,7 +366,6 @@ async function loadTransactions(address: string): Promise<void> {
   try {
     const pubkey = new PublicKey(address);
 
-    // Fetch latest 10 transaction signatures
     const signatures = await connection.getSignaturesForAddress(pubkey, {
       limit: 10,
     });
@@ -368,7 +375,6 @@ async function loadTransactions(address: string): Promise<void> {
       return;
     }
 
-    // Fetch full transaction details
     const txDetails = await connection.getParsedTransactions(
       signatures.map((s) => s.signature),
       { maxSupportedTransactionVersion: 0 },
@@ -399,7 +405,6 @@ function renderTxRow(
       </div>`;
   }
 
-  // Calculate SOL change for this wallet
   const accountKeys = tx.transaction.message.accountKeys;
   const walletIndex = accountKeys.findIndex(
     (k) => k.pubkey.toString() === walletAddress,
@@ -437,13 +442,11 @@ function truncate(str: string, len = 8): string {
 // ── saveWalletAndOpenDashboard
 async function saveWalletAndOpenDashboard(password: string): Promise<void> {
   const { encrypted, iv, salt } = await encryptSecret(pendingSecret, password);
-
-  // ← derive real public key instead of truncating
   const address = derivePublicAddress(pendingSecret);
 
   const wallet: WalletData = {
     name: pendingWalletName,
-    address, // ← full valid public key
+    address,
     encrypted,
     iv: iv + ":" + salt,
   };
@@ -456,12 +459,11 @@ async function saveWalletAndOpenDashboard(password: string): Promise<void> {
   });
 }
 
-// ── Derive real Solana public key ──────────────────────────
+// ── Derive real Solana public key
 function derivePublicAddress(secret: string): string {
   try {
     const words = secret.trim().split(" ");
 
-    // Case 1: mnemonic (12 words)
     if (words.length === 12) {
       const seed = bip39.mnemonicToSeedSync(secret);
       const ab = seed.buffer.slice(seed.byteOffset, seed.byteOffset + 32);
@@ -483,10 +485,8 @@ function derivePublicAddress(secret: string): string {
     let keypair: Keypair;
 
     if (keyBytes.length === 32) {
-      // 32 bytes = seed only → use fromSeed
       keypair = Keypair.fromSeed(keyBytes);
     } else if (keyBytes.length === 64) {
-      // 64 bytes = full keypair → use fromSecretKey
       keypair = Keypair.fromSecretKey(keyBytes);
     } else {
       throw new Error(
@@ -501,16 +501,3 @@ function derivePublicAddress(secret: string): string {
     return "Invalid Key";
   }
 }
-// ```
-
-// ---
-
-// ## Complete Flow
-// ```
-// Page 1  Welcome
-//  ├── Create New Wallet
-//  │    └── Page 2 (seed phrase) → Page 6 (set password) → Page 7 (dashboard)
-//  └── Already Have Wallet
-//       └── Page 3 (restore options)
-//            ├── Import Recovery Phrase → Page 4 → Page 6 → Page 7
-//            └── Import Private Key    → Page 5 → Page 6 → Page 7
