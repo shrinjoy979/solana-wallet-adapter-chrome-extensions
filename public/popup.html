@@ -430,6 +430,144 @@
         font-size: 9px;
         color: #555;
       }
+
+      /* Send Page */
+      .send-header {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+
+      .send-header h2 {
+        font-size: 18px;
+      }
+
+      .send-form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .send-field {
+        position: relative;
+        width: 100%;
+      }
+
+      .recipient-input {
+        width: 100%;
+        background: #1e1e30;
+        border: 1px solid #333;
+        border-radius: 14px;
+        padding: 14px 44px 14px 16px;
+        color: #fff;
+        font-size: 13px;
+        outline: none;
+        resize: none;
+        font-family: sans-serif;
+        transition: border 0.2s;
+      }
+
+      .recipient-input:focus {
+        border-color: #ab9ff2;
+      }
+      .recipient-input::placeholder {
+        color: #555;
+      }
+
+      .paste-btn {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #2a2a40;
+        border: 1px solid #444;
+        border-radius: 50%;
+        color: #888;
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .paste-btn:hover {
+        color: #fff;
+        border-color: #ab9ff2;
+      }
+
+      .amount-field {
+        display: flex;
+        align-items: center;
+        background: #1e1e30;
+        border: 1px solid #333;
+        border-radius: 14px;
+        padding: 12px 16px;
+        gap: 10px;
+        transition: border 0.2s;
+      }
+
+      .amount-field:focus-within {
+        border-color: #ab9ff2;
+      }
+
+      .amount-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        outline: none;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 600;
+        width: 100%;
+      }
+
+      .amount-input::placeholder {
+        color: #555;
+      }
+
+      /* Remove number input arrows */
+      .amount-input::-webkit-outer-spin-button,
+      .amount-input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+      }
+
+      .amount-currency {
+        font-size: 14px;
+        color: #888;
+        font-weight: 600;
+      }
+
+      .max-btn {
+        background: #2a2a40;
+        border: 1px solid #444;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 4px 10px;
+        cursor: pointer;
+        transition: border-color 0.2s;
+      }
+
+      .max-btn:hover {
+        border-color: #ab9ff2;
+        color: #ab9ff2;
+      }
+
+      .send-balance {
+        font-size: 11px;
+        color: #555;
+        text-align: right;
+      }
+
+      .send-balance span {
+        color: #888;
+      }
     </style>
   </head>
   <body>
@@ -622,6 +760,52 @@
         </div>
       </div>
     </div>
+
+    <!-- PAGE 8 — Send SOL -->
+    <div class="page" id="page8">
+      <div class="send-header">
+        <button class="back-btn" id="btnBackPage8">← Back</button>
+        <h2>Send SOL</h2>
+        <span></span>
+      </div>
+
+      <div class="send-form">
+        <!-- Recipient Address -->
+        <div class="send-field">
+          <textarea
+            id="inputRecipient"
+            class="recipient-input"
+            placeholder="Recipient's Solana address"
+            rows="2"
+            autocomplete="off"
+            spellcheck="false"
+          ></textarea>
+          <button class="paste-btn" id="btnPasteAddress">@</button>
+        </div>
+
+        <!-- Amount -->
+        <div class="amount-field">
+          <input
+            id="inputAmount"
+            class="amount-input"
+            type="number"
+            placeholder="0"
+            min="0"
+            step="any"
+          />
+          <span class="amount-currency">SOL</span>
+          <button class="max-btn" id="btnMaxAmount">Max</button>
+        </div>
+
+        <p class="send-balance">
+          Available: <span id="sendAvailableBalance">—</span> SOL
+        </p>
+        <p class="error-msg" id="sendError"></p>
+      </div>
+
+      <button class="btn btn-primary" id="btnConfirmSend">Send</button>
+    </div>
+
     <script src="popup.js"></script>
   </body>
 </html>
