@@ -9,6 +9,7 @@ import {
   LAMPORTS_PER_SOL,
 } from "@solana/web3.js";
 import bs58 from "bs58";
+import QRCode from "qrcode";
 
 // ── Solana Connection ──────────────────────────────────────
 const SOLANA_RPC =
@@ -43,6 +44,7 @@ const page5 = getEl<HTMLDivElement>("page5");
 const page6 = getEl<HTMLDivElement>("page6");
 const page7 = getEl<HTMLDivElement>("page7");
 const page8 = getEl<HTMLDivElement>("page8");
+const page9 = getEl<HTMLDivElement>("page9");
 
 // ── Page 1 ─────────────────────────────────────────────────
 const btnCreateWallet = getEl<HTMLButtonElement>("btnCreateWallet");
@@ -96,6 +98,12 @@ const btnBackPage8 = getEl<HTMLButtonElement>("btnBackPage8");
 const sendAvailableBalance = getEl<HTMLSpanElement>("sendAvailableBalance");
 const sendError = getEl<HTMLParagraphElement>("sendError");
 
+// ── Page 9 elements ────────────────────────────────────────
+const receiveAddress = getEl<HTMLParagraphElement>("receiveAddress");
+const btnCopyReceiveAddress = getEl<HTMLButtonElement>("btnCopyReceiveAddress");
+const btnCloseReceive = getEl<HTMLButtonElement>("btnCloseReceive");
+const btnBackPage9 = getEl<HTMLButtonElement>("btnBackPage9");
+
 // ── State ──────────────────────────────────────────────────
 let currentMnemonic = "";
 let pendingWalletName = "";
@@ -108,7 +116,7 @@ function showPage(pageEl: HTMLDivElement | null): void {
     console.error("❌ showPage called with null");
     return;
   }
-  [page1, page2, page3, page4, page5, page6, page7, page8].forEach((p) =>
+  [page1, page2, page3, page4, page5, page6, page7, page8, page9].forEach((p) =>
     p?.classList.remove("active"),
   );
   pageEl.classList.add("active");
@@ -596,7 +604,17 @@ on(btnSend, () => {
   showPage(page8);
 });
 
-on(btnReceive, () => sendMessage("receive"));
+on(btnReceive, () => {
+  chrome.storage.local.get("wallet", async (result) => {
+    if (!result.wallet) return;
+    const wallet = result.wallet as WalletData;
+    const address = wallet.address;
+
+    if (receiveAddress) receiveAddress.textContent = address;
+    await renderQRCode(address);
+    showPage(page9);
+  });
+});
 
 // ── Page 8 ─────────────────────────────────────────────────
 on(btnPasteAddress, async () => {
@@ -699,3 +717,49 @@ chrome.storage.local.get("wallet", (result) => {
     showPage(page7);
   }
 });
+
+// ── Render QR code ─────────────────────────────────────────
+async function renderQRCode(address: string): Promise<void> {
+  const qrContainer = document.getElementById("qrCode");
+  if (!qrContainer) return;
+
+  qrContainer.innerHTML = "";
+
+  const canvas = document.createElement("canvas");
+  await QRCode.toCanvas(canvas, address, {
+    width: 160,
+    margin: 1,
+    color: {
+      dark: "#ffffff",
+      light: "#1e1e30",
+    },
+  });
+  qrContainer.appendChild(canvas);
+}
+
+// ── Wire: Page 9 ───────────────────────────────────────────
+on(btnCopyReceiveAddress, () => {
+  const addr = receiveAddress?.textContent ?? "";
+  navigator.clipboard.writeText(addr).then(() => {
+    if (btnCopyReceiveAddress) {
+      btnCopyReceiveAddress.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        Copied!`;
+      setTimeout(() => {
+        if (btnCopyReceiveAddress) {
+          btnCopyReceiveAddress.innerHTML = `
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+            Copy Address`;
+        }
+      }, 2000);
+    }
+  });
+});
+
+on(btnCloseReceive, () => showPage(page7));
+on(btnBackPage9, () => showPage(page7));
