@@ -8,7 +8,7 @@ https://github.com/user-attachments/assets/a2913256-d93f-4a93-a2fe-027703761d2c
   <a href="https://github.com/shrinjoy979/SOLi" target="_blank">Open Repository</a>
 
 - **Live Demo:**  
-  <a href="https://sol-i.vercel.app/" target="_blank">View Live App</a>
+  <a href="https://sol-i.vercel.app/" target="_blank">https://sol-i.vercel.app/</a>
 
 # SOLi – Solana Wallet Extension
 
