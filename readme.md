@@ -45,3 +45,67 @@ It provides essential wallet and token utilities in a clean UI.
 ```bash
 git clone https://github.com/your-username/soli-wallet-extension.git
 cd soli-wallet-extension
+
+---
+
+## Project Structure
+solana-wallet-adapter-chrome-extensions/
+├── public/ Static assets and extension manifest resources
+├── src/ Source code (wallet logic, UI components)
+├── manifest.json Chrome extension manifest configuration
+├── package.json Project dependencies and scripts
+├── tsconfig.json TypeScript configuration
+├── webpack.config.js Webpack bundler configuration
+└── .gitignore
+
+
+---
+
+## Setup Project
+
+### 1. Clone the repository
+
+git clone https://github.com/shrinjoy979/solana-wallet-adapter-chrome-extensions.git
+cd solana-wallet-adapter-chrome-extensions
+
+
+### 2. Install dependencies
+
+npm install
+
+
+### 3. Build the extension
+
+npm run build
+
+
+### 4. Load into Chrome
+
+1. Open Chrome and navigate to `chrome://extensions/`
+2. Enable "Developer mode" in the top right corner
+3. Click "Load unpacked" and select the `dist` (build output) folder
+4. The SOLi wallet extension icon will appear in your Chrome toolbar
+
+---
+
+## Usage
+
+1. Click the SOLi icon in the Chrome toolbar
+2. Create a new wallet or import an existing one using a private key or seed phrase
+3. Use the interface to send SOL, receive SOL, and view transaction history
+
+---
+
+## Disclaimer
+
+This extension handles private keys and seed phrases. Use only on trusted devices and never share your private key or seed phrase with anyone. This project is provided as-is for educational and development purposes.
+
+---
+
+## Contributing
+
+Contributions are welcome. Feel free to open an issue or submit a pull request.
+
+## License
+
+Specify your license here (e.g., MIT).
